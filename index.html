@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IHK Lernapp">
+<meta name="theme-color" content="#1B2A4A">
+<title>IHK Lernapp – Großhandel</title>
+
+<!-- PWA Manifest inline -->
+<script>
+const manifestData = {
+  name: "IHK Lernapp – Groß- und Außenhandel",
+  short_name: "IHK Lernapp",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#F8FAFC",
+  theme_color: "#1B2A4A",
+  orientation: "portrait",
+  icons: [
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231B2A4A'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='white'%3E📚%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+const url = URL.createObjectURL(blob);
+const link = document.createElement('link');
+link.rel = 'manifest';
+link.href = url;
+document.head.appendChild(link);
+</script>
+
+<style>
+:root {
+  --navy: #1B2A4A;
+  --blau: #1E5FAD;
+  --hellblau: #D6E8F7;
+  --eisblau: #EDF4FB;
+  --gruen: #1A6B3C;
+  --hellgruen: #D4EDDA;
+  --rot: #B91C1C;
+  --hellrot: #FEE2E2;
+  --orange: #C05621;
+  --hellorange: #FDEBD0;
+  --gold: #B7791F;
+  --hellgold: #FEF3C7;
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --border: #E2E8F0;
+  --text: #1E293B;
+  --text2: #475569;
+  --text3: #94A3B8;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0F172A;
+    --surface: #1E293B;
+    --border: #334155;
+    --text: #F1F5F9;
+    --text2: #94A3B8;
+    --text3: #475569;
+    --eisblau: #1E3A5F;
+    --hellblau: #1E3A5F;
+    --hellgruen: #14532D;
+    --hellrot: #450A0A;
+    --hellorange: #431407;
+    --hellgold: #451A03;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  padding-top: calc(var(--safe-top));
+  padding-bottom: calc(60px + var(--safe-bot));
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.app-header {
+  background: var(--navy);
+  padding: calc(14px + var(--safe-top)) 16px 14px;
+  margin-top: calc(-1 * var(--safe-top));
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.app-header h1 { font-size: 17px; font-weight: 600; color: #fff; }
+.app-header p  { font-size: 12px; color: #A8C4E4; margin-top: 2px; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  background: var(--surface);
+  border-top: 0.5px solid var(--border);
+  display: flex;
+  padding-bottom: var(--safe-bot);
+  z-index: 100;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 4px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--text3);
+  font-size: 10px;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+.nav-item.active { color: var(--blau); }
+.nav-icon { font-size: 20px; line-height: 1; }
+
+/* ── PAGES ── */
+.page { display: none; padding: 16px; }
+.page.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+/* ── HOME ── */
+.progress-overview {
+  background: var(--navy);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+  color: #fff;
+}
+.progress-overview h2 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.progress-overview p  { font-size: 13px; color: #A8C4E4; margin-bottom: 12px; }
+.prog-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.prog-label { font-size: 12px; color: #C8D8F0; }
+.prog-val   { font-size: 12px; color: #fff; font-weight: 600; }
+.prog-bar-outer { height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; }
+.prog-bar-inner { height: 100%; background: #60A5FA; border-radius: 3px; transition: width 0.4s; }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.stat-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.stat-val { font-size: 26px; font-weight: 700; color: var(--blau); }
+.stat-lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+.chapter-list { display: flex; flex-direction: column; gap: 10px; }
+.chapter-item {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  -webkit-user-select: none;
+}
+.chapter-item:active { background: var(--bg); }
+.ch-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.ch-info { flex: 1; min-width: 0; }
+.ch-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.ch-sub  { font-size: 12px; color: var(--text2); }
+.ch-prog { margin-top: 6px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.ch-prog-fill { height: 100%; background: var(--blau); border-radius: 2px; transition: width 0.3s; }
+.ch-arrow { color: var(--text3); font-size: 16px; }
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  margin-bottom: 4px;
+}
+.badge-p1 { background: var(--hellblau); color: var(--blau); }
+.badge-p2 { background: var(--hellgruen); color: var(--gruen); }
+.badge-tool { background: var(--hellgold); color: var(--gold); }
+
+/* ── LEARN PAGE ── */
+.seg-control {
+  display: flex;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+.seg-btn {
+  flex: 1;
+  padding: 8px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.seg-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ── THEORY ── */
+.theory-section { margin-bottom: 20px; }
+.theory-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 10px;
+  padding-left: 10px;
+  border-left: 3px solid var(--blau);
+}
+.theory-text {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+.formula-box {
+  background: var(--eisblau);
+  border-left: 3px solid var(--blau);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: 'SF Mono', monospace;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  .formula-box { color: #93C5FD; }
+}
+.tip-box {
+  background: var(--hellgold);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+.warn-box {
+  background: var(--hellrot);
+  border-left: 3px solid var(--rot);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--rot);
+  margin-bottom: 8px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* ── SCHRITT-TABELLE ── */
+.step-tbl { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+.step-tbl td { padding: 8px 8px; border-bottom: 0.5px solid var(--border); }
+.step-tbl tr:last-child td { border-bottom: none; background: var(--eisblau); font-weight: 600; }
+.step-tbl .op { width: 24px; text-align: center; color: var(--text3); font-size: 14px; }
+.step-tbl .amt { text-align: right; font-family: 'SF Mono', monospace; white-space: nowrap; }
+.step-tbl .neg .amt { color: var(--rot); }
+.step-tbl .pos .amt { color: var(--gruen); }
+
+/* ── DEF TABLE ── */
+.def-tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.def-tbl td { padding: 8px; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+.def-tbl tr:last-child td { border-bottom: none; }
+.def-tbl .dt { font-weight: 600; color: var(--navy); width: 40%; }
+@media (prefers-color-scheme: dark) { .def-tbl .dt { color: #93C5FD; } }
+
+/* ── QUIZ ── */
+.quiz-q { margin-bottom: 20px; }
+.quiz-q-text { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
+.quiz-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 0.5px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  transition: all 0.15s;
+  background: var(--surface);
+}
+.quiz-opt:active { background: var(--bg); }
+.quiz-opt.correct { background: var(--hellgruen); border-color: var(--gruen); color: var(--gruen); }
+.quiz-opt.wrong   { background: var(--hellrot);   border-color: var(--rot);   color: var(--rot);   }
+.quiz-opt.disabled { pointer-events: none; }
+.quiz-opt-radio {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+}
+.quiz-opt.correct .quiz-opt-radio { background: var(--gruen); border-color: var(--gruen); }
+.quiz-opt.wrong   .quiz-opt-radio { background: var(--rot);   border-color: var(--rot);   }
+.quiz-feedback {
+  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-top: 4px;
+  line-height: 1.6;
+  display: none;
+}
+.quiz-feedback.ok { background: var(--hellgruen); color: var(--gruen); }
+.quiz-feedback.no { background: var(--hellrot);   color: var(--rot);   }
+
+.btn-primary {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--blau);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity 0.15s;
+}
+.btn-primary:active { opacity: 0.85; }
+.btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--surface);
+  color: var(--blau);
+  border: 1px solid var(--blau);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.score-box {
+  background: var(--navy);
+  border-radius: 14px;
+  padding: 24px 16px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.score-circle {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 3px solid #60A5FA;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  margin: 0 auto 12px;
+}
+.score-big { font-size: 24px; font-weight: 700; color: #fff; }
+.score-pct { font-size: 12px; color: #A8C4E4; }
+.score-msg { font-size: 14px; color: #A8C4E4; }
+
+/* ── KALKULATIONS-TOOL ── */
+.tool-input-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.input-row { margin-bottom: 12px; }
+.input-row label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 5px; font-weight: 500; }
+.input-row input {
+  width: 100%;
+  padding: 11px 12px;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'SF Mono', monospace;
+  outline: none;
+  -webkit-appearance: none;
+}
+.input-row input:focus { border-color: var(--blau); }
+
+.result-card {
+  background: var(--navy);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.result-card .rc-title { font-size: 12px; color: #A8C4E4; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  font-size: 13px;
+}
+.result-row:last-child { border-bottom: none; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.15); }
+.result-row .rl { color: #A8C4E4; }
+.result-row .rv { color: #fff; font-family: 'SF Mono', monospace; font-weight: 600; }
+.result-row:last-child .rl { color: #60A5FA; font-weight: 600; font-size: 14px; }
+.result-row:last-child .rv { color: #fff; font-size: 16px; }
+.result-row .rv.pos { color: #34D399; }
+.result-row .rv.neg { color: #F87171; }
+
+.tool-select {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding-bottom: 4px;
+  margin-bottom: 16px;
+  scrollbar-width: none;
+}
+.tool-select::-webkit-scrollbar { display: none; }
+.tool-pill {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.tool-pill.active {
+  background: var(--blau);
+  color: #fff;
+  border-color: var(--blau);
+}
+
+/* ── FORMELSAMMLUNG ── */
+.formel-group { margin-bottom: 20px; }
+.formel-group-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+.formel-item {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.fi-name  { font-size: 12px; font-weight: 600; color: var(--blau); margin-bottom: 4px; }
+.fi-formel{ font-size: 13px; font-family: 'SF Mono', monospace; color: var(--text); margin-bottom: 2px; }
+.fi-hint  { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+/* ── INSTALL BANNER ── */
+.install-banner {
+  background: var(--hellblau);
+  border: 1px solid var(--blau);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+@media (prefers-color-scheme: dark) { .install-banner { background: #1E3A5F; } }
+.ib-icon { font-size: 28px; flex-shrink: 0; }
+.ib-text h3 { font-size: 14px; font-weight: 600; color: var(--blau); margin-bottom: 4px; }
+.ib-text p  { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.ib-close {
+  background: none; border: none; color: var(--text3);
+  font-size: 18px; cursor: pointer; flex-shrink: 0; padding: 0;
+}
+
+.section-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 20px 0 10px;
+}
+.divider { height: 0.5px; background: var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>IHK Lernapp</h1>
+  <p>Groß- und Außenhandelsmanagement</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SEITE 1: HOME
+     ════════════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+
+  <div id="install-banner" class="install-banner">
+    <div class="ib-icon">📲</div>
+    <div class="ib-text">
+      <h3>Als App installieren</h3>
+      <p>Tippe unten auf das Teilen-Symbol ⬆ und dann auf „Zum Home-Bildschirm" – fertig!</p>
+    </div>
+    <button class="ib-close" onclick="document.getElementById('install-banner').style.display='none'">×</button>
+  </div>
+
+  <div class="progress-overview">
+    <h2>Dein Lernfortschritt</h2>
+    <p>Quiz-Ergebnisse werden automatisch gespeichert.</p>
+    <div class="prog-row">
+      <span class="prog-label">Gesamt-Fortschritt</span>
+      <span class="prog-val" id="home-pct">0 %</span>
+    </div>
+    <div class="prog-bar-outer">
+      <div class="prog-bar-inner" id="home-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-val" id="home-done">0/5</div>
+      <div class="stat-lbl">Kapitel abgeschlossen</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="home-score">–</div>
+      <div class="stat-lbl">Durchschnittlicher Score</div>
+    </div>
+  </div>
+
+  <div class="section-header">Kapitel</div>
+  <div class="chapter-list">
+    <div class="chapter-item" onclick="openChapter(1)">
+      <div class="ch-icon" style="background:#EDF4FB">📊</div>
+      <div class="ch-info">
+        <div class="badge badge-p1">P1 – Muss</div>
+        <div class="ch-name">Handelskalkulation</div>
+        <div class="ch-sub">Bezug, Verkauf, Rückwärts</div>
+        <div class="ch-prog"><div class="ch-prog-fill" id="cpb-1" style="width:0%"></div></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </div>
+    <div class="chapter-item" onclick="openChapter(2)">
+      <div class="ch-icon" style="background:#D4EDDA">💰</div>
+      <div class="ch-info">
+        <div class="badge badge-p1">P1 – Muss</div>
+        <div class="ch-name">Rabatt & Skonto</div>
+        <div class="ch-sub">Preisnachlässe, Effektivzins</div>
+        <div class="ch-prog"><div class="ch-prog-fill" id="cpb-2" style="width:0%"></div></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </div>
+    <div class="chapter-item" onclick="openChapter(3)">
+      <div class="ch-icon" style="background:#FEE2E2">⚖️</div>
+      <div class="ch-info">
+        <div class="badge badge-p1">P1 – Muss</div>
+        <div class="ch-name">Rechtliche Grundlagen</div>
+        <div class="ch-sub">Kaufvertrag, Mängelrechte, Verzug</div>
+        <div class="ch-prog"><div class="ch-prog-fill" id="cpb-3" style="width:0%"></div></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </div>
+    <div class="chapter-item" onclick="openChapter(4)">
+      <div class="ch-icon" style="background:#FEF3C7">📈</div>
+      <div class="ch-info">
+        <div class="badge badge-p1">P1 – Muss</div>
+        <div class="ch-name">Deckungsbeitrag & BEP</div>
+        <div class="ch-sub">DB-Rechnung, Break-Even-Point</div>
+        <div class="ch-prog"><div class="ch-prog-fill" id="cpb-4" style="width:0%"></div></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </div>
+    <div class="chapter-item" onclick="openChapter(5)">
+      <div class="ch-icon" style="background:#FDEBD0">📦</div>
+      <div class="ch-info">
+        <div class="badge badge-p2">P2 – Wichtig</div>
+        <div class="ch-name">Lagerwirtschaft</div>
+        <div class="ch-sub">Kennzahlen, Andler-Formel</div>
+        <div class="ch-prog"><div class="ch-prog-fill" id="cpb-5" style="width:0%"></div></div>
+      </div>
+      <div class="ch-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SEITE 2: LERNSEITE (dynamisch)
+     ════════════════════════════════════════════════════════ -->
+<div id="page-learn" class="page">
+  <div class="seg-control">
+    <button class="seg-btn active" onclick="setLearnTab('theory', this)">Theorie</button>
+    <button class="seg-btn" onclick="setLearnTab('example', this)">Rechenweg</button>
+    <button class="seg-btn" onclick="setLearnTab('quiz', this)">Quiz</button>
+  </div>
+  <div id="learn-theory"></div>
+  <div id="learn-example" style="display:none"></div>
+  <div id="learn-quiz" style="display:none"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SEITE 3: KALKULATIONS-TOOL
+     ════════════════════════════════════════════════════════ -->
+<div id="page-tools" class="page">
+
+  <div class="tool-select" id="tool-select">
+    <button class="tool-pill active" onclick="setTool('bezug',this)">Bezugskalk.</button>
+    <button class="tool-pill" onclick="setTool('verkauf',this)">Verkaufskalk.</button>
+    <button class="tool-pill" onclick="setTool('db',this)">DB & BEP</button>
+    <button class="tool-pill" onclick="setTool('skonto',this)">Skonto-Vorteil</button>
+    <button class="tool-pill" onclick="setTool('lager',this)">Lagerkennzahlen</button>
+  </div>
+
+  <!-- BEZUGSKALKULATION -->
+  <div id="tool-bezug">
+    <div class="tool-input-card">
+      <div class="card-title">Bezugskalkulation</div>
+      <div class="input-row"><label>Listeneinkaufspreis (€)</label><input type="number" inputmode="decimal" id="b-lep" value="100" oninput="calcBezug()"></div>
+      <div class="input-row"><label>Lieferantenrabatt (%)</label><input type="number" inputmode="decimal" id="b-rab" value="10" oninput="calcBezug()"></div>
+      <div class="input-row"><label>Lieferantenskonto (%)</label><input type="number" inputmode="decimal" id="b-sko" value="2" oninput="calcBezug()"></div>
+      <div class="input-row"><label>Bezugskosten (€)</label><input type="number" inputmode="decimal" id="b-bk" value="5" oninput="calcBezug()"></div>
+    </div>
+    <div class="result-card">
+      <div class="rc-title">Ergebnis – Schritt für Schritt</div>
+      <div id="bezug-res"></div>
+    </div>
+    <div class="warn-box">Skonto wird auf den ZIELEINKAUFSPREIS berechnet – nicht auf den Listeneinkaufspreis!</div>
+  </div>
+
+  <!-- VERKAUFSKALKULATION -->
+  <div id="tool-verkauf" style="display:none">
+    <div class="tool-input-card">
+      <div class="card-title">Verkaufskalkulation</div>
+      <div class="input-row"><label>Bezugspreis (€)</label><input type="number" inputmode="decimal" id="v-bp" value="50" oninput="calcVerkauf()"></div>
+      <div class="input-row"><label>Handlungskosten (%)</label><input type="number" inputmode="decimal" id="v-hk" value="20" oninput="calcVerkauf()"></div>
+      <div class="input-row"><label>Gewinnzuschlag (%)</label><input type="number" inputmode="decimal" id="v-gew" value="10" oninput="calcVerkauf()"></div>
+      <div class="input-row"><label>Kundenskonto (%) – Hundert-Methode</label><input type="number" inputmode="decimal" id="v-ksko" value="2" oninput="calcVerkauf()"></div>
+      <div class="input-row"><label>Kundenrabatt (%) – Hundert-Methode</label><input type="number" inputmode="decimal" id="v-krab" value="5" oninput="calcVerkauf()"></div>
+    </div>
+    <div class="result-card">
+      <div class="rc-title">Ergebnis – Schritt für Schritt</div>
+      <div id="verkauf-res"></div>
+    </div>
+    <div class="tip-box">Hundert-Methode: Kundenskonto 2 % → Aufschlag = BVP × 2 ÷ 98. Der Kunde zieht es später ab – so bleibt exakt der BVP übrig.</div>
+  </div>
+
+  <!-- DB & BEP -->
+  <div id="tool-db" style="display:none">
+    <div class="tool-input-card">
+      <div class="card-title">Deckungsbeitrag & Break-Even</div>
+      <div class="input-row"><label>Verkaufspreis (€/Stück)</label><input type="number" inputmode="decimal" id="d-vp" value="22" oninput="calcDB()"></div>
+      <div class="input-row"><label>Variable Kosten (€/Stück)</label><input type="number" inputmode="decimal" id="d-vk" value="14" oninput="calcDB()"></div>
+      <div class="input-row"><label>Verkaufte Menge (Stück/Monat)</label><input type="number" inputmode="numeric" id="d-menge" value="1500" oninput="calcDB()"></div>
+      <div class="input-row"><label>Monatliche Fixkosten (€)</label><input type="number" inputmode="decimal" id="d-fix" value="9000" oninput="calcDB()"></div>
+    </div>
+    <div class="result-card">
+      <div class="rc-title">Ergebnis</div>
+      <div id="db-res"></div>
+    </div>
+  </div>
+
+  <!-- SKONTO -->
+  <div id="tool-skonto" style="display:none">
+    <div class="tool-input-card">
+      <div class="card-title">Skonto-Vorteilhaftigkeitsrechnung</div>
+      <div class="input-row"><label>Rechnungsbetrag (€)</label><input type="number" inputmode="decimal" id="sk-betrag" value="12000" oninput="calcSkonto()"></div>
+      <div class="input-row"><label>Skontosatz (%)</label><input type="number" inputmode="decimal" id="sk-satz" value="3" oninput="calcSkonto()"></div>
+      <div class="input-row"><label>Zahlungsziel (Tage)</label><input type="number" inputmode="numeric" id="sk-ziel" value="60" oninput="calcSkonto()"></div>
+      <div class="input-row"><label>Skontofrist (Tage)</label><input type="number" inputmode="numeric" id="sk-frist" value="10" oninput="calcSkonto()"></div>
+      <div class="input-row"><label>Bankzins (% p.a.)</label><input type="number" inputmode="decimal" id="sk-bank" value="7" oninput="calcSkonto()"></div>
+    </div>
+    <div class="result-card">
+      <div class="rc-title">Ergebnis</div>
+      <div id="skonto-res"></div>
+    </div>
+  </div>
+
+  <!-- LAGER -->
+  <div id="tool-lager" style="display:none">
+    <div class="tool-input-card">
+      <div class="card-title">Lagerkennzahlen & Andler-Formel</div>
+      <div class="input-row"><label>Jahresumsatz zu EK-Preisen (€)</label><input type="number" inputmode="decimal" id="l-u" value="840000" oninput="calcLager()"></div>
+      <div class="input-row"><label>Anfangsbestand (€)</label><input type="number" inputmode="decimal" id="l-ab" value="75000" oninput="calcLager()"></div>
+      <div class="input-row"><label>Endbestand (€)</label><input type="number" inputmode="decimal" id="l-eb" value="65000" oninput="calcLager()"></div>
+      <div class="divider"></div>
+      <div class="card-title" style="font-size:13px;margin-bottom:10px">Andler-Formel (optional)</div>
+      <div class="input-row"><label>Jahresbedarf (Mengeneinheiten)</label><input type="number" inputmode="numeric" id="l-jb" value="6000" oninput="calcLager()"></div>
+      <div class="input-row"><label>Bestellkosten (€/Bestellung)</label><input type="number" inputmode="decimal" id="l-bk" value="75" oninput="calcLager()"></div>
+      <div class="input-row"><label>EK-Preis (€/ME)</label><input type="number" inputmode="decimal" id="l-ekp" value="15" oninput="calcLager()"></div>
+      <div class="input-row"><label>Lagerkostensatz (%)</label><input type="number" inputmode="decimal" id="l-lks" value="20" oninput="calcLager()"></div>
+    </div>
+    <div class="result-card">
+      <div class="rc-title">Ergebnis</div>
+      <div id="lager-res"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SEITE 4: FORMELSAMMLUNG
+     ════════════════════════════════════════════════════════ -->
+<div id="page-formeln" class="page">
+  <div class="formel-group">
+    <div class="formel-group-title">Kapitel 1 – Handelskalkulation</div>
+    <div class="formel-item"><div class="fi-name">Listeneinkaufspreis − Rabatt</div><div class="fi-formel">= Zieleinkaufspreis (ZEP)</div><div class="fi-hint">Basis für Skonto-Berechnung!</div></div>
+    <div class="formel-item"><div class="fi-name">ZEP − Skonto</div><div class="fi-formel">= Bareinkaufspreis</div></div>
+    <div class="formel-item"><div class="fi-name">Bareinkaufspreis + Bezugskosten</div><div class="fi-formel">= BEZUGSPREIS</div><div class="fi-hint">Tatsächliche Kosten je Einheit</div></div>
+    <div class="formel-item"><div class="fi-name">Bezugspreis + Handlungskosten</div><div class="fi-formel">= Selbstkosten</div></div>
+    <div class="formel-item"><div class="fi-name">Selbstkosten + Gewinn</div><div class="fi-formel">= Barverkaufspreis (BVP)</div></div>
+    <div class="formel-item"><div class="fi-name">Kundenskonto-Aufschlag (Hundert-Methode)</div><div class="fi-formel">BVP × Skonto% ÷ (100 − Skonto%)</div><div class="fi-hint">Aufschlagen, damit nach Abzug BVP übrigbleibt</div></div>
+    <div class="formel-item"><div class="fi-name">Kundenrabatt-Aufschlag (Hundert-Methode)</div><div class="fi-formel">ZVP × Rabatt% ÷ (100 − Rabatt%)</div></div>
+    <div class="formel-item"><div class="fi-name">Rückwärtskalkulation: Gewinn herausrechnen</div><div class="fi-formel">BVP × Gewinn% ÷ (100 + Gewinn%)</div></div>
+  </div>
+  <div class="formel-group">
+    <div class="formel-group-title">Kapitel 2 – Rabatt & Skonto</div>
+    <div class="formel-item"><div class="fi-name">Skontobetrag</div><div class="fi-formel">Zieleinkaufspreis × Skontosatz ÷ 100</div></div>
+    <div class="formel-item"><div class="fi-name">Effektivzins (Skonto)</div><div class="fi-formel">Skonto% ÷ (Zahlungsziel − Skontofrist) × 360</div><div class="fi-hint">Ergebnis in % p.a. – mit Bankzins vergleichen</div></div>
+    <div class="formel-item"><div class="fi-name">Entscheidungsregel</div><div class="fi-formel">Effektivzins &gt; Bankzins → Skonto nutzen!</div></div>
+  </div>
+  <div class="formel-group">
+    <div class="formel-group-title">Kapitel 3 – Recht</div>
+    <div class="formel-item"><div class="fi-name">Verzugszinsen</div><div class="fi-formel">Betrag × Zinssatz × Tage ÷ 360</div></div>
+    <div class="formel-item"><div class="fi-name">Zinssatz B2B (§ 288 BGB)</div><div class="fi-formel">Basiszinssatz + 9 Prozentpunkte</div></div>
+    <div class="formel-item"><div class="fi-name">Zinssatz B2C (§ 288 BGB)</div><div class="fi-formel">Basiszinssatz + 5 Prozentpunkte</div></div>
+    <div class="formel-item"><div class="fi-name">Mängelrechte – Reihenfolge!</div><div class="fi-formel">1. Nacherfüllung → 2. Rücktritt / Minderung → 3. Schadensersatz</div><div class="fi-hint">Nacherfüllung IMMER zuerst!</div></div>
+    <div class="formel-item"><div class="fi-name">Gewährleistungsfrist (Neuware)</div><div class="fi-formel">2 Jahre ab Lieferung (§ 438 BGB)</div></div>
+  </div>
+  <div class="formel-group">
+    <div class="formel-group-title">Kapitel 4 – Deckungsbeitrag & BEP</div>
+    <div class="formel-item"><div class="fi-name">DB pro Stück</div><div class="fi-formel">Verkaufspreis − variable Kosten/Stück</div><div class="fi-hint">Beitrag zur Fixkostendeckung</div></div>
+    <div class="formel-item"><div class="fi-name">DB gesamt</div><div class="fi-formel">Umsatz − gesamte variable Kosten</div></div>
+    <div class="formel-item"><div class="fi-name">DB-Quote</div><div class="fi-formel">DB gesamt ÷ Umsatz × 100</div><div class="fi-hint">Ergebnis in %</div></div>
+    <div class="formel-item"><div class="fi-name">Gewinn / Verlust</div><div class="fi-formel">DB gesamt − Fixkosten</div></div>
+    <div class="formel-item"><div class="fi-name">Break-Even-Point (Menge)</div><div class="fi-formel">Fixkosten ÷ DB/Stück</div><div class="fi-hint">Mindestabsatzmenge</div></div>
+    <div class="formel-item"><div class="fi-name">Break-Even-Point (Umsatz)</div><div class="fi-formel">Fixkosten ÷ DB-Quote</div></div>
+    <div class="formel-item"><div class="fi-name">Sicherheitsmarge</div><div class="fi-formel">Ist-Umsatz − BEP-Umsatz</div></div>
+  </div>
+  <div class="formel-group">
+    <div class="formel-group-title">Kapitel 5 – Lagerwirtschaft</div>
+    <div class="formel-item"><div class="fi-name">Mindestbestand</div><div class="fi-formel">Tagesverbrauch × Lieferverzugszeit</div></div>
+    <div class="formel-item"><div class="fi-name">Meldebestand</div><div class="fi-formel">Mindestbestand + (Tagesverbrauch × Lieferzeit)</div></div>
+    <div class="formel-item"><div class="fi-name">Ø Lagerbestand</div><div class="fi-formel">(Anfangsbestand + Endbestand) ÷ 2</div></div>
+    <div class="formel-item"><div class="fi-name">Umschlagshäufigkeit</div><div class="fi-formel">Jahresumsatz (EK) ÷ Ø Lagerbestand</div><div class="fi-hint">Ergebnis: x-mal pro Jahr</div></div>
+    <div class="formel-item"><div class="fi-name">Lagerdauer</div><div class="fi-formel">360 ÷ Umschlagshäufigkeit</div><div class="fi-hint">Ergebnis: Tage</div></div>
+    <div class="formel-item"><div class="fi-name">Andler-Formel</div><div class="fi-formel">√( 200 × Jahresbedarf × Bestellkosten ÷ (EK-Preis × Lagerkostensatz%) )</div><div class="fi-hint">Optimale Bestellmenge in Mengeneinheiten</div></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     BOTTOM NAV
+     ════════════════════════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="showPage('home',this)" id="nav-home">
+    <span class="nav-icon">🏠</span>Start
+  </button>
+  <button class="nav-item" onclick="showPage('learn',this)" id="nav-learn">
+    <span class="nav-icon">📖</span>Lernen
+  </button>
+  <button class="nav-item" onclick="showPage('tools',this)" id="nav-tools">
+    <span class="nav-icon">🧮</span>Kalkulation
+  </button>
+  <button class="nav-item" onclick="showPage('formeln',this)" id="nav-formeln">
+    <span class="nav-icon">📐</span>Formeln
+  </button>
+</nav>
+
+<script>
+// ── FORMAT HELPERS ────────────────────────────────────────
+const fE = v => isNaN(v)||!isFinite(v) ? '–' : v.toFixed(2).replace('.',',') + ' €';
+const fP = v => isNaN(v)||!isFinite(v) ? '–' : v.toFixed(2).replace('.',',') + ' %';
+const fN = v => isNaN(v)||!isFinite(v) ? '–' : Math.round(v).toLocaleString('de-DE');
+
+// ── NAVIGATION ────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='tools') { setTimeout(()=>{ calcBezug();calcVerkauf();calcDB();calcSkonto();calcLager(); }, 80); }
+}
+
+// ── KAPITEL DATEN ─────────────────────────────────────────
+const CHAPTERS = {
+  1: {
+    name: 'Handelskalkulation',
+    theory: `
+      <div class="theory-section">
+        <h3>Warum kalkulieren?</h3>
+        <div class="theory-text">Als Kaufmann im Großhandel kaufst du Waren ein und verkaufst sie weiter. Um Gewinn zu machen, musst du genau wissen, was die Ware wirklich kostet (Bezugspreis) und zu welchem Preis du sie verkaufen musst.</div>
+      </div>
+      <div class="theory-section">
+        <h3>Bezugskalkulation – Schritt für Schritt</h3>
+        <div class="formula-box">LEP − Lieferantenrabatt = Zieleinkaufspreis (ZEP)</div>
+        <div class="formula-box">ZEP − Lieferantenskonto = Bareinkaufspreis</div>
+        <div class="formula-box">Bareinkaufspreis + Bezugskosten = BEZUGSPREIS</div>
+        <div class="warn-box">⚠️ Skonto wird auf den ZIELEINKAUFSPREIS berechnet – nicht auf den Listeneinkaufspreis!</div>
+        <div class="theory-text">Begriffe im Überblick:</div>
+        <table class="def-tbl">
+          <tr><td class="dt">Listeneinkaufspreis</td><td>Preis im Lieferantenkatalog. Ausgangspunkt.</td></tr>
+          <tr><td class="dt">Lieferantenrabatt</td><td>Preisnachlass in % vom Listeneinkaufspreis (Mengen-, Treue-, Sonderrabatt)</td></tr>
+          <tr><td class="dt">Zieleinkaufspreis</td><td>LEP minus Rabatt. Basis für Skonto!</td></tr>
+          <tr><td class="dt">Lieferantenskonto</td><td>Preisnachlass bei frühzeitiger Zahlung. In % vom ZEP!</td></tr>
+          <tr><td class="dt">Bezugskosten</td><td>Fracht, Verpackung, Versicherung bis ins eigene Lager</td></tr>
+          <tr><td class="dt">Bezugspreis</td><td>Echte Gesamtkosten je Einheit. Basis der Verkaufskalkulation.</td></tr>
+        </table>
+      </div>
+      <div class="theory-section">
+        <h3>Verkaufskalkulation</h3>
+        <div class="formula-box">Bezugspreis + Handlungskosten = Selbstkosten</div>
+        <div class="formula-box">Selbstkosten + Gewinnzuschlag = Barverkaufspreis (BVP)</div>
+        <div class="formula-box">BVP + Kundenskonto* = Zielverkaufspreis (ZVP)</div>
+        <div class="formula-box">ZVP + Kundenrabatt* = LISTENVERKAUFSPREIS</div>
+        <div class="tip-box">💡 *Hundert-Methode: Kundenskonto 2 % → Aufschlag = BVP × 2 ÷ 98. Damit bleibt nach dem Abzug genau der BVP übrig!</div>
+        <table class="def-tbl">
+          <tr><td class="dt">Handlungskosten</td><td>Betriebskosten: Miete, Gehälter, Büro, Lager</td></tr>
+          <tr><td class="dt">Selbstkosten</td><td>Alle Kosten bis zum Verkauf – ohne Gewinn</td></tr>
+          <tr><td class="dt">Barverkaufspreis</td><td>Preis bei sofortiger Barzahlung</td></tr>
+          <tr><td class="dt">Hundert-Methode</td><td>Skonto/Rabatt aufschlagen statt addieren</td></tr>
+        </table>
+      </div>`,
+    example: `
+      <div class="card">
+        <div class="card-title">Bezugskalkulation – Lebensmittelgroßhandel</div>
+        <div class="theory-text">LEP 15,00 € | Rabatt 10 % | Skonto 2 % | Bezugskosten 0,50 €</div>
+        <table class="step-tbl">
+          <tr><td class="op"></td><td>Listeneinkaufspreis (LEP)</td><td class="amt">15,00 €</td></tr>
+          <tr class="neg"><td class="op">−</td><td>Lieferantenrabatt (10% × 15,00€)</td><td class="amt">1,50 €</td></tr>
+          <tr><td class="op">=</td><td><b>Zieleinkaufspreis (ZEP)</b></td><td class="amt"><b>13,50 €</b></td></tr>
+          <tr class="neg"><td class="op">−</td><td>Lieferantenskonto (2% × 13,50€ ← auf ZEP!)</td><td class="amt">0,27 €</td></tr>
+          <tr><td class="op">=</td><td><b>Bareinkaufspreis</b></td><td class="amt"><b>13,23 €</b></td></tr>
+          <tr class="pos"><td class="op">+</td><td>Bezugskosten</td><td class="amt">0,50 €</td></tr>
+          <tr><td class="op">=</td><td><b>BEZUGSPREIS</b></td><td class="amt"><b>13,73 €</b></td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">Verkaufskalkulation – Schritt für Schritt</div>
+        <div class="theory-text">BP 50€ | HK 20% | Gewinn 10% | Kundenskonto 2% | Kundenrabatt 5%</div>
+        <table class="step-tbl">
+          <tr><td class="op"></td><td>Bezugspreis</td><td class="amt">50,00 €</td></tr>
+          <tr class="pos"><td class="op">+</td><td>Handlungskosten (20% × 50€)</td><td class="amt">10,00 €</td></tr>
+          <tr><td class="op">=</td><td><b>Selbstkosten</b></td><td class="amt"><b>60,00 €</b></td></tr>
+          <tr class="pos"><td class="op">+</td><td>Gewinnzuschlag (10% × 60€)</td><td class="amt">6,00 €</td></tr>
+          <tr><td class="op">=</td><td><b>Barverkaufspreis (BVP)</b></td><td class="amt"><b>66,00 €</b></td></tr>
+          <tr class="pos"><td class="op">+</td><td>Kundenskonto (2÷98 × 66€)</td><td class="amt">1,35 €</td></tr>
+          <tr><td class="op">=</td><td><b>Zielverkaufspreis</b></td><td class="amt"><b>67,35 €</b></td></tr>
+          <tr class="pos"><td class="op">+</td><td>Kundenrabatt (5÷95 × 67,35€)</td><td class="amt">3,44 €</td></tr>
+          <tr><td class="op">=</td><td><b>LISTENVERKAUFSPREIS</b></td><td class="amt"><b>70,79 €</b></td></tr>
+        </table>
+        <div class="tip-box">✓ Probe: 70,79 − 5% = 67,25 € − 2% = 65,91 € ≈ 66,00 €</div>
+      </div>`,
+    quiz: [
+      {q:'Auf welchen Betrag wird der Lieferantenskonto berechnet?',opts:['Auf den Listeneinkaufspreis','Auf den Zieleinkaufspreis','Auf den Bezugspreis','Auf den Barverkaufspreis'],a:1,e:'Skonto wird auf den ZEP berechnet – nach dem Rabattabzug, nicht vom Listenpreis!'},
+      {q:'Was gehört zu den Handlungskosten?',opts:['Frachtkosten vom Lieferanten','Miete, Gehälter, Bürokosten','Der Gewinnzuschlag','Der Lieferantenrabatt'],a:1,e:'Handlungskosten = interne Betriebskosten. Frachtkosten = Bezugskosten!'},
+      {q:'Wie wird Kundenskonto richtig einkalkuliert?',opts:['Direkt auf den BVP addieren','Per Hundert-Methode aufschlagen','Vom Gewinn abziehen','Nicht einkalkulieren'],a:1,e:'Hundert-Methode: Skonto% ÷ (100−Skonto%) × BVP. So bleibt nach dem Abzug exakt der BVP übrig.'},
+      {q:'Bezugspreis 100€, HK 20%, Gewinn 10%. Was ist der Barverkaufspreis?',opts:['110,00 €','120,00 €','132,00 €','130,00 €'],a:2,e:'SK = 100 + 20 = 120€. BVP = 120 + 10% = 132,00€.'},
+    ]
+  },
+  2: {
+    name: 'Rabatt & Skonto',
+    theory: `
+      <div class="theory-section">
+        <h3>Rabattarten im Überblick</h3>
+        <table class="def-tbl">
+          <tr><td class="dt">Mengenrabatt</td><td>Nachlass bei großer Bestellmenge</td></tr>
+          <tr><td class="dt">Treuerabatt</td><td>Für langjährige Stammkunden</td></tr>
+          <tr><td class="dt">Sonderrabatt</td><td>Einmalig, z.B. Lagerräumung</td></tr>
+          <tr><td class="dt">Funktionsrabatt</td><td>Für Händler / Wiederverkäufer</td></tr>
+          <tr><td class="dt">Barrabatt</td><td>Bei sofortiger Barzahlung</td></tr>
+        </table>
+      </div>
+      <div class="theory-section">
+        <h3>Skonto – Der Zeitrabatt</h3>
+        <div class="theory-text">Skonto = Preisnachlass bei frühzeitiger Zahlung. Immer auf den ZIELEINKAUFSPREIS berechnen!</div>
+        <div class="tip-box">💡 Beispiel: „30 Tage netto, 10 Tage 2 % Skonto"<br>→ Zahlung in 10 Tagen: 2 % Nachlass<br>→ Zahlung nach 30 Tagen: voller Betrag fällig<br>→ Zahlung nach 30+ Tagen: Zahlungsverzug!</div>
+      </div>
+      <div class="theory-section">
+        <h3>Skonto-Vorteilhaftigkeitsrechnung</h3>
+        <div class="formula-box">Effektivzins = Skonto% ÷ (Zahlungsziel − Skontofrist) × 360</div>
+        <div class="tip-box">💡 Regel: Effektivzins &gt; Bankzins → Skonto immer nutzen! Kredit aufnehmen und sofort zahlen spart Geld.</div>
+      </div>`,
+    example: `
+      <div class="card">
+        <div class="card-title">Vorteilhaftigkeitsrechnung – Schritt für Schritt</div>
+        <div class="theory-text">Rechnung 12.000€ | 60 Tage netto, 10 Tage 3% Skonto | Bankzins 7%</div>
+        <table class="step-tbl">
+          <tr class="pos"><td class="op">1.</td><td>Skontobetrag: 12.000 × 3%</td><td class="amt">360,00 €</td></tr>
+          <tr><td class="op">2.</td><td>Effektivzins: 3 ÷ (60−10) × 360</td><td class="amt">21,60 % p.a.</td></tr>
+          <tr><td class="op">3.</td><td>Bankzins</td><td class="amt">7,00 % p.a.</td></tr>
+          <tr><td class="op">→</td><td><b>21,60% &gt; 7% → Skonto nutzen!</b></td><td class="amt"><b>360€ sparen</b></td></tr>
+        </table>
+        <div class="tip-box">Die Zinsen für den Kredit (12.000 × 7% × 50/360 = 116,67€) sind viel günstiger als der Skontoverzicht (360€). Nettoersparnis: 360 − 116,67 = 243,33€.</div>
+      </div>`,
+    quiz: [
+      {q:'Was unterscheidet Skonto von Rabatt?',opts:['Skonto ist immer höher','Skonto = Zeitnachlass, Rabatt = sonstiger Preisnachlass','Beide sind identisch','Rabatt bei Barzahlung'],a:1,e:'Skonto = Nachlass bei frühzeitiger Zahlung (Zeitrabatt). Rabatt = allgemeiner Preisnachlass.'},
+      {q:'Auf welchen Betrag wird der Lieferantenskonto berechnet?',opts:['Listeneinkaufspreis','Bezugspreis','Zieleinkaufspreis','Barverkaufspreis'],a:2,e:'Skonto wird auf den ZEP berechnet (nach dem Rabattabzug).'},
+      {q:'Rechnung 10.000€, 2% Skonto, 60T netto, 15T Skontofrist. Effektivzins?',opts:['2,00% p.a.','16,00% p.a.','24,00% p.a.','8,00% p.a.'],a:1,e:'Effektivzins = 2 ÷ (60−15) × 360 = 2 ÷ 45 × 360 = 16,00% p.a.'},
+      {q:'Effektivzins 20%, Bankzins 8%. Was tun?',opts:['Nicht zahlen','Skonto ignorieren','Skonto nutzen – sofort zahlen','Bankzins verhandeln'],a:2,e:'Effektivzins (20%) &gt; Bankzins (8%) → Skonto immer nutzen!'},
+    ]
+  },
+  3: {
+    name: 'Rechtliche Grundlagen',
+    theory: `
+      <div class="theory-section">
+        <h3>Kaufvertrag – Zustandekommen</h3>
+        <div class="theory-text">Ein Kaufvertrag kommt durch Angebot + Annahme zustande. Beide müssen inhaltlich identisch sein.</div>
+        <div class="warn-box">⚠️ Abgeändertes „Ja, aber..." = neues Gegenangebot. Kein Vertrag!</div>
+        <table class="def-tbl">
+          <tr><td class="dt">Bindendes Angebot</td><td>Nicht widerrufbar während der Bindungsfrist</td></tr>
+          <tr><td class="dt">Freibleibendes Angebot</td><td>Jederzeit widerrufbar (Zusatz: „freibleibend")</td></tr>
+          <tr><td class="dt">Invitatio ad offerendum</td><td>Aufforderung zur Angebotsabgabe – kein Angebot! (Katalog, Schaufenster)</td></tr>
+        </table>
+      </div>
+      <div class="theory-section">
+        <h3>Mängelrechte nach § 437 BGB</h3>
+        <div class="warn-box">⚠️ Reihenfolge ist entscheidend! Nacherfüllung IMMER zuerst!</div>
+        <table class="def-tbl">
+          <tr><td class="dt" style="color:#B7791F">1. Nacherfüllung</td><td>Reparatur ODER Neulieferung – Käufer wählt!</td></tr>
+          <tr><td class="dt">2. Rücktritt</td><td>Vertrag rückabwickeln (nach Fristablauf)</td></tr>
+          <tr><td class="dt">3. Minderung</td><td>Preis herabsetzen, Ware behalten</td></tr>
+          <tr><td class="dt">4. Schadensersatz</td><td>Zusätzlichen Schaden geltend machen</td></tr>
+        </table>
+      </div>
+      <div class="theory-section">
+        <h3>Gewährleistung vs. Garantie</h3>
+        <table class="def-tbl">
+          <tr><td class="dt">Gewährleistung</td><td>Gesetzlich (§ 437), gegen Verkäufer, 2 Jahre (Neuware), B2C nicht ausschließbar</td></tr>
+          <tr><td class="dt">Garantie</td><td>Freiwillig, gegen Hersteller, Dauer frei vereinbar, nur wenn schriftlich zugesagt</td></tr>
+        </table>
+      </div>
+      <div class="theory-section">
+        <h3>Zahlungsverzug</h3>
+        <div class="formula-box">Verzugszinsen = Betrag × Zinssatz × Tage ÷ 360</div>
+        <table class="def-tbl">
+          <tr><td class="dt">B2B-Zinssatz</td><td>Basiszinssatz + 9 Prozentpunkte (§ 288 BGB)</td></tr>
+          <tr><td class="dt">B2C-Zinssatz</td><td>Basiszinssatz + 5 Prozentpunkte (§ 288 BGB)</td></tr>
+        </table>
+      </div>`,
+    example: `
+      <div class="card">
+        <div class="card-title">Verzugszinsen berechnen – Schritt für Schritt</div>
+        <div class="theory-text">Rechnung 30.000€ | fällig 01.03. | Zahlung 15.04. (45 Tage Verzug) | B2B | Basiszins 3,62%</div>
+        <table class="step-tbl">
+          <tr><td class="op">1.</td><td>Zinssatz B2B: 3,62% + 9 Pkte.</td><td class="amt">12,62%</td></tr>
+          <tr><td class="op">2.</td><td>Verzugstage</td><td class="amt">45 Tage</td></tr>
+          <tr><td class="op">3.</td><td>Zinsen: 30.000 × 12,62% × 45÷360</td><td class="amt">472,50 €</td></tr>
+          <tr><td class="op">=</td><td><b>Gesamtforderung: 30.000 + 472,50</b></td><td class="amt"><b>30.472,50 €</b></td></tr>
+        </table>
+      </div>`,
+    quiz: [
+      {q:'Welches Mängelrecht muss IMMER zuerst ausgeübt werden?',opts:['Rücktritt','Minderung','Nacherfüllung','Schadensersatz'],a:2,e:'§ 439 BGB – Verkäufer hat das Recht, den Mangel selbst zu beheben.'},
+      {q:'Wie lange gilt die gesetzliche Gewährleistung bei Neuware?',opts:['1 Jahr','2 Jahre','5 Jahre','6 Monate'],a:1,e:'§ 438 BGB – 2 Jahre ab Ablieferung. B2B-Gebrauchtware: auf 1 Jahr kürzbar.'},
+      {q:'Was ist der Unterschied Gewährleistung vs. Garantie?',opts:['Kein Unterschied','Gewährleistung gesetzlich/Verkäufer; Garantie freiwillig/Hersteller','Garantie gesetzlich vorgeschrieben','Nur für Privatpersonen'],a:1,e:'Gewährleistung = gesetzliche Pflicht gegen Verkäufer. Garantie = freiwillig vom Hersteller.'},
+      {q:'Wann tritt Zahlungsverzug ohne Mahnung ein?',opts:['Nach 14 Tagen','Bei kalenderlich bestimmtem Termin','Nur bei B2B','Nie ohne Mahnung'],a:1,e:'§ 286 Abs. 2 Nr. 1 BGB – bei konkretem Kalendertag tritt Verzug automatisch am Folgetag ein.'},
+    ]
+  },
+  4: {
+    name: 'Deckungsbeitrag & BEP',
+    theory: `
+      <div class="theory-section">
+        <h3>Variable Kosten vs. Fixkosten</h3>
+        <table class="def-tbl">
+          <tr><td class="dt">Variable Kosten</td><td>Ändern sich mit der Menge: Wareneinsatz, Verpackung, Provisionen</td></tr>
+          <tr><td class="dt">Fixkosten</td><td>Bleiben konstant: Miete, Gehälter, Abschreibungen, Leasing</td></tr>
+        </table>
+        <div class="warn-box">Kein Umsatz → trotzdem volle Fixkosten! Variable Kosten fallen nur bei Produktion/Verkauf an.</div>
+      </div>
+      <div class="theory-section">
+        <h3>Deckungsbeitrag – Formeln</h3>
+        <div class="formula-box">DB/Stück = Verkaufspreis − variable Kosten/Stück</div>
+        <div class="formula-box">DB gesamt = Umsatz − gesamte variable Kosten</div>
+        <div class="formula-box">DB-Quote = DB gesamt ÷ Umsatz × 100</div>
+        <div class="formula-box">Gewinn/Verlust = DB gesamt − Fixkosten</div>
+        <div class="tip-box">💡 Der DB zeigt, was nach den variablen Kosten übrig bleibt – dieser Betrag trägt zur Deckung der Fixkosten bei. Danach entsteht Gewinn.</div>
+      </div>
+      <div class="theory-section">
+        <h3>Break-Even-Point (BEP)</h3>
+        <div class="formula-box">BEP (Menge) = Fixkosten ÷ DB/Stück</div>
+        <div class="formula-box">BEP (Umsatz) = Fixkosten ÷ DB-Quote</div>
+        <div class="formula-box">Sicherheitsmarge = Ist-Umsatz − BEP-Umsatz</div>
+        <div class="tip-box">💡 Unterhalb BEP: Verlust. Oberhalb BEP: Gewinn. Am BEP: Erlöse = Gesamtkosten (kein Gewinn, kein Verlust).</div>
+      </div>`,
+    example: `
+      <div class="card">
+        <div class="card-title">DB-Rechnung & BEP – Elektrogroßhandel</div>
+        <div class="theory-text">VP 22€ | var.K. 14€ | Menge 1.500 Stück/Monat | Fixkosten 9.000€</div>
+        <table class="step-tbl">
+          <tr><td class="op">1.</td><td>DB/Stück: 22 − 14</td><td class="amt">8,00 €</td></tr>
+          <tr><td class="op">2.</td><td>Umsatz: 22 × 1.500</td><td class="amt">33.000 €</td></tr>
+          <tr><td class="op">3.</td><td>DB gesamt: 8 × 1.500</td><td class="amt">12.000 €</td></tr>
+          <tr><td class="op">4.</td><td>DB-Quote: 12.000÷33.000×100</td><td class="amt">36,36 %</td></tr>
+          <tr><td class="op">5.</td><td>Fixkosten</td><td class="amt">9.000 €</td></tr>
+          <tr><td class="op">=</td><td><b>Gewinn: 12.000 − 9.000</b></td><td class="amt"><b>3.000 €</b></td></tr>
+        </table>
+        <div class="divider"></div>
+        <table class="step-tbl">
+          <tr><td class="op">6.</td><td>BEP Menge: 9.000÷8</td><td class="amt">1.125 Stück</td></tr>
+          <tr><td class="op">7.</td><td>BEP Umsatz: 1.125×22</td><td class="amt">24.750 €</td></tr>
+          <tr><td class="op">=</td><td><b>Sicherheitsmarge: 33.000−24.750</b></td><td class="amt"><b>8.250 €</b></td></tr>
+        </table>
+      </div>`,
+    quiz: [
+      {q:'Was zeigt der Deckungsbeitrag pro Stück?',opts:['Gewinn je Stück','Betrag zur Fixkostendeckung nach var. Kosten','Bezugspreis minus HK','Listenpreis minus Rabatt'],a:1,e:'DB/Stück = VP − variable Kosten. Dieser Betrag deckt Fixkosten – danach entsteht Gewinn.'},
+      {q:'Was gilt am Break-Even-Point?',opts:['Maximaler Gewinn','Variable = Fixkosten','Erlöse = Gesamtkosten','DB-Quote = 100%'],a:2,e:'Am BEP: Erlöse = Gesamtkosten. Weder Gewinn noch Verlust.'},
+      {q:'VP 60€, var.K. 42€, Fixkosten 5.400€. Wie hoch ist der BEP?',opts:['300 Stück','90 Stück','128 Stück','5.400 Stück'],a:0,e:'DB = 60−42 = 18€. BEP = 5.400 ÷ 18 = 300 Stück.'},
+      {q:'Fixkosten steigen um 20%. Wie verändert sich der BEP?',opts:['BEP sinkt','Bleibt gleich','Steigt um 20%','Hängt von var. Kosten ab'],a:2,e:'BEP = Fixkosten ÷ DB. Steigen Fixkosten um 20%, steigt der BEP proportional um 20%.'},
+    ]
+  },
+  5: {
+    name: 'Lagerwirtschaft',
+    theory: `
+      <div class="theory-section">
+        <h3>Lagerbestandsarten</h3>
+        <table class="def-tbl">
+          <tr><td class="dt">Mindestbestand</td><td>Notfallreserve – darf nie unterschritten werden.<br>Formel: Tagesverbrauch × Lieferverzugszeit</td></tr>
+          <tr><td class="dt">Meldebestand</td><td>Bei diesem Stand neu bestellen.<br>Formel: Mindestbestand + (Tagesverbrauch × Lieferzeit)</td></tr>
+          <tr><td class="dt">Höchstbestand</td><td>Maximale Lagermenge.<br>Formel: Mindestbestand + opt. Bestellmenge</td></tr>
+          <tr><td class="dt">Ø Lagerbestand</td><td>(Anfangsbestand + Endbestand) ÷ 2</td></tr>
+        </table>
+      </div>
+      <div class="theory-section">
+        <h3>Lagerkennzahlen</h3>
+        <div class="formula-box">Umschlagshäufigkeit = Jahresumsatz (EK) ÷ Ø Lagerbestand</div>
+        <div class="formula-box">Lagerdauer (Tage) = 360 ÷ Umschlagshäufigkeit</div>
+        <div class="tip-box">💡 Hohe Umschlagshäufigkeit = Ware läuft schnell → wenig Kapital gebunden → geringe Lagerkosten → gut!</div>
+      </div>
+      <div class="theory-section">
+        <h3>Andler-Formel – Optimale Bestellmenge</h3>
+        <div class="formula-box">√( 200 × Jahresbedarf × Bestellkosten ÷ (EK-Preis × Lagerkostensatz%) )</div>
+        <div class="tip-box">💡 Minimiert die Summe aus Bestellkosten (sinken mit Menge) und Lagerkosten (steigen mit Menge).</div>
+      </div>`,
+    example: `
+      <div class="card">
+        <div class="card-title">Lagerkennzahlen – Schritt für Schritt</div>
+        <div class="theory-text">Jahresumsatz (EK) 840.000€ | Anfangsbestand 75.000€ | Endbestand 65.000€</div>
+        <table class="step-tbl">
+          <tr><td class="op">1.</td><td>Ø Lagerbestand: (75.000+65.000)÷2</td><td class="amt">70.000 €</td></tr>
+          <tr><td class="op">2.</td><td>Umschlagshäuf.: 840.000÷70.000</td><td class="amt">12-mal/Jahr</td></tr>
+          <tr><td class="op">=</td><td><b>Lagerdauer: 360÷12</b></td><td class="amt"><b>30 Tage</b></td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">Andler-Formel – Schritt für Schritt</div>
+        <div class="theory-text">Jahresbedarf 6.000 ME | Bestellkosten 75€ | EK-Preis 15€ | Lagerkostensatz 20%</div>
+        <table class="step-tbl">
+          <tr><td class="op">1.</td><td>Zähler: 200 × 6.000 × 75</td><td class="amt">90.000.000</td></tr>
+          <tr><td class="op">2.</td><td>Nenner: 15 × 20</td><td class="amt">300</td></tr>
+          <tr><td class="op">3.</td><td>Bruch: 90.000.000 ÷ 300</td><td class="amt">300.000</td></tr>
+          <tr><td class="op">=</td><td><b>Opt. Bestellmenge: √300.000</b></td><td class="amt"><b>548 ME</b></td></tr>
+        </table>
+      </div>`,
+    quiz: [
+      {q:'Was misst die Umschlagshäufigkeit?',opts:['Gewinn des Lagers','Wie oft der Bestand im Jahr komplett umgeschlagen wird','Maximale Kapazität','Täglichen Verbrauch'],a:1,e:'UH = Jahresumsatz (EK) ÷ Ø Lagerbestand. Zeigt Lagerrotationsgeschwindigkeit.'},
+      {q:'Was bedeutet eine hohe Umschlagshäufigkeit?',opts:['Zu viel Kapital gebunden','Lager überfüllt','Ware läuft schnell – wenig Kapital gebunden','Viele Bestellungen nötig'],a:2,e:'Hohe UH = Ware fließt schnell → wenig Kapital gebunden → niedrige Lagerkosten.'},
+      {q:'Umschlagshäufigkeit = 9. Wie hoch ist die Lagerdauer?',opts:['9 Tage','40 Tage','90 Tage','360 Tage'],a:1,e:'Lagerdauer = 360 ÷ 9 = 40 Tage.'},
+      {q:'Welche zwei Kosten minimiert die Andler-Formel?',opts:['Variable & Fixkosten','Bestellkosten & Lagerkosten','Einkaufs- & Transportkosten','Personal- & Mietkosten'],a:1,e:'Andler findet Optimum: Bestellkosten sinken mit größerer Menge, Lagerkosten steigen.'},
+    ]
+  }
+};
+
+// ── QUIZ STATE (localStorage) ─────────────────────────────
+function loadState() {
+  try { return JSON.parse(localStorage.getItem('ihk_quiz_state')||'{}'); } catch(e) { return {}; }
+}
+function saveState(s) {
+  try { localStorage.setItem('ihk_quiz_state', JSON.stringify(s)); } catch(e) {}
+}
+let quizState = loadState();
+
+// ── CHAPTER OPEN ──────────────────────────────────────────
+let currentChap = 1;
+function openChapter(n) {
+  currentChap = n;
+  const ch = CHAPTERS[n];
+  document.getElementById('learn-theory').innerHTML = ch.theory;
+  document.getElementById('learn-example').innerHTML = ch.example;
+  renderQuiz(n);
+  setLearnTab('theory', null);
+  showPage('learn', document.getElementById('nav-learn'));
+}
+
+// ── LEARN TABS ────────────────────────────────────────────
+function setLearnTab(tab, btn) {
+  ['theory','example','quiz'].forEach(t => {
+    document.getElementById('learn-'+t).style.display = t===tab ? '' : 'none';
+  });
+  document.querySelectorAll('#page-learn .seg-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else {
+    const btns = document.querySelectorAll('#page-learn .seg-btn');
+    const idx  = ['theory','example','quiz'].indexOf(tab);
+    if(btns[idx]) btns[idx].classList.add('active');
+  }
+  if(tab==='quiz') renderQuiz(currentChap);
+}
+
+// ── QUIZ RENDER ───────────────────────────────────────────
+function renderQuiz(n) {
+  const container = document.getElementById('learn-quiz');
+  const qs = CHAPTERS[n].quiz;
+  const state = quizState[n] || {};
+  const checked = state.checked || false;
+  let html = '';
+  qs.forEach((q, qi) => {
+    const ans = state.answers ? state.answers[qi] : undefined;
+    html += `<div class="quiz-q">
+      <div class="quiz-q-text">${qi+1}. ${q.q}</div>`;
+    q.opts.forEach((o, oi) => {
+      let cls = 'quiz-opt';
+      if(checked) {
+        cls += ' disabled';
+        if(oi===q.a) cls += ' correct';
+        else if(oi===ans && ans!==q.a) cls += ' wrong';
+      }
+      html += `<div class="${cls}" onclick="selectOpt(${n},${qi},${oi})">
+        <div class="quiz-opt-radio">${checked&&oi===q.a ? '✓' : checked&&oi===ans&&ans!==q.a ? '✗' : ''}</div>
+        ${o}
+      </div>`;
+    });
+    if(checked) {
+      const ok = ans===q.a;
+      html += `<div class="quiz-feedback ${ok?'ok':'no'}" style="display:block">
+        ${ok ? '✓ Richtig! ' : '✗ Falsch. Richtige Antwort: '+q.opts[q.a]+'. '}${q.e}
+      </div>`;
+    }
+    html += '</div>';
+  });
+  if(checked) {
+    const correct = qs.filter((q,i)=>(state.answers||{})[i]===q.a).length;
+    const pct = Math.round(correct/qs.length*100);
+    html += `<div class="score-box">
+      <div class="score-circle">
+        <span class="score-big">${correct}/${qs.length}</span>
+        <span class="score-pct">${pct} %</span>
+      </div>
+      <div class="score-msg">${pct===100?'Perfekt! 🎉':pct>=75?'Sehr gut! Weiter so.':'Noch einmal üben – du schaffst das!'}</div>
+    </div>
+    <button class="btn-secondary" onclick="resetQuiz(${n})">Quiz neu starten</button>`;
+  } else {
+    html += `<button class="btn-primary" onclick="checkQuiz(${n})">Auswerten</button>`;
+  }
+  container.innerHTML = html;
+}
+
+function selectOpt(n, qi, oi) {
+  if(!quizState[n]) quizState[n] = {answers:{}, checked:false};
+  if(quizState[n].checked) return;
+  quizState[n].answers[qi] = oi;
+  // Visual feedback on selection
+  const container = document.getElementById('learn-quiz');
+  const qEl = container.querySelectorAll('.quiz-q')[qi];
+  qEl.querySelectorAll('.quiz-opt').forEach(el => el.style.borderColor = '');
+  qEl.querySelectorAll('.quiz-opt')[oi].style.borderColor = 'var(--blau)';
+  qEl.querySelectorAll('.quiz-opt')[oi].style.background = 'var(--eisblau)';
+}
+
+function checkQuiz(n) {
+  if(!quizState[n]) quizState[n] = {answers:{}, checked:false};
+  quizState[n].checked = true;
+  saveState(quizState);
+  renderQuiz(n);
+  updateProgress();
+}
+
+function resetQuiz(n) {
+  delete quizState[n];
+  saveState(quizState);
+  renderQuiz(n);
+  updateProgress();
+}
+
+// ── PROGRESS ──────────────────────────────────────────────
+function updateProgress() {
+  let total = 0, correct = 0, done = 0;
+  [1,2,3,4,5].forEach(n => {
+    const s = quizState[n];
+    const qs = CHAPTERS[n].quiz;
+    if(s && s.checked) {
+      done++;
+      const c = qs.filter((q,i)=>(s.answers||{})[i]===q.a).length;
+      correct += c; total += qs.length;
+      const pct = Math.round(c/qs.length*100);
+      const bar = document.getElementById('cpb-'+n);
+      if(bar) bar.style.width = pct+'%';
+    }
+  });
+  const ovPct = total ? Math.round(correct/total*100) : 0;
+  const homeBar = document.getElementById('home-bar');
+  const homePct = document.getElementById('home-pct');
+  const homeDone = document.getElementById('home-done');
+  const homeScore = document.getElementById('home-score');
+  if(homeBar) homeBar.style.width = ovPct+'%';
+  if(homePct) homePct.textContent = ovPct+' %';
+  if(homeDone) homeDone.textContent = done+'/5';
+  if(homeScore) homeScore.textContent = total ? ovPct+' %' : '–';
+}
+
+// ── TOOL SWITCH ───────────────────────────────────────────
+const TOOLS = ['bezug','verkauf','db','skonto','lager'];
+function setTool(name, btn) {
+  TOOLS.forEach(t => document.getElementById('tool-'+t).style.display = t===name?'':'none');
+  document.querySelectorAll('.tool-pill').forEach(p => p.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+// ── CALC HELPERS ──────────────────────────────────────────
+function mkRR(label, val, cls='') {
+  const color = cls==='pos'?'var(--gruen)':cls==='neg'?'var(--rot)':'#fff';
+  return `<div class="result-row"><span class="rl">${label}</span><span class="rv" style="color:${color}">${val}</span></div>`;
+}
+
+function calcBezug() {
+  const lep=+document.getElementById('b-lep').value||0;
+  const rab=+document.getElementById('b-rab').value||0;
+  const sko=+document.getElementById('b-sko').value||0;
+  const bk =+document.getElementById('b-bk').value||0;
+  const rabB=lep*rab/100, zep=lep-rabB;
+  const skoB=zep*sko/100, bei=zep-skoB;
+  const bez=bei+bk;
+  document.getElementById('bezug-res').innerHTML =
+    mkRR('Listeneinkaufspreis', fE(lep)) +
+    mkRR('− Lieferantenrabatt ('+rab+'%)', fE(rabB), 'neg') +
+    mkRR('= Zieleinkaufspreis (ZEP)', fE(zep)) +
+    mkRR('− Lieferantenskonto ('+sko+'% × ZEP)', fE(skoB), 'neg') +
+    mkRR('= Bareinkaufspreis', fE(bei)) +
+    mkRR('+ Bezugskosten', fE(bk), 'pos') +
+    mkRR('= BEZUGSPREIS', fE(bez));
+}
+
+function calcVerkauf() {
+  const bp  =+document.getElementById('v-bp').value||0;
+  const hk  =+document.getElementById('v-hk').value||0;
+  const gew =+document.getElementById('v-gew').value||0;
+  const ksko=+document.getElementById('v-ksko').value||0;
+  const krab=+document.getElementById('v-krab').value||0;
+  const hkB=bp*hk/100, sk=bp+hkB;
+  const gewB=sk*gew/100, bvp=sk+gewB;
+  const kskoA=bvp*ksko/(100-ksko), zvp=bvp+kskoA;
+  const krabA=zvp*krab/(100-krab), lvp=zvp+krabA;
+  document.getElementById('verkauf-res').innerHTML =
+    mkRR('Bezugspreis', fE(bp)) +
+    mkRR('+ Handlungskosten ('+hk+'%)', fE(hkB), 'pos') +
+    mkRR('= Selbstkosten', fE(sk)) +
+    mkRR('+ Gewinnzuschlag ('+gew+'%)', fE(gewB), 'pos') +
+    mkRR('= Barverkaufspreis (BVP)', fE(bvp)) +
+    mkRR('+ Kundenskonto ('+ksko+'÷'+(100-ksko)+'×BVP)', fE(kskoA), 'pos') +
+    mkRR('= Zielverkaufspreis', fE(zvp)) +
+    mkRR('+ Kundenrabatt ('+krab+'÷'+(100-krab)+'×ZVP)', fE(krabA), 'pos') +
+    mkRR('= LISTENVERKAUFSPREIS', fE(lvp));
+}
+
+function calcDB() {
+  const vp   =+document.getElementById('d-vp').value||0;
+  const vk   =+document.getElementById('d-vk').value||0;
+  const menge=+document.getElementById('d-menge').value||0;
+  const fix  =+document.getElementById('d-fix').value||0;
+  const db=vp-vk, umsatz=vp*menge, dbGes=db*menge;
+  const dbQ=umsatz?dbGes/umsatz*100:0;
+  const gew=dbGes-fix;
+  const bepM=db?fix/db:0, bepU=bepM*vp, sm=umsatz-bepU;
+  document.getElementById('db-res').innerHTML =
+    mkRR('DB/Stück: '+fE(vp)+' − '+fE(vk), fE(db)) +
+    mkRR('Umsatz: '+fE(vp)+' × '+fN(menge)+' Stück', fE(umsatz)) +
+    mkRR('DB gesamt', fE(dbGes)) +
+    mkRR('DB-Quote', fP(dbQ)) +
+    mkRR('Fixkosten', fE(fix)) +
+    mkRR((gew>=0?'Gewinn':'Verlust'), fE(gew), gew>=0?'pos':'neg') +
+    mkRR('─── Break-Even ───', '') +
+    mkRR('BEP Menge: '+fE(fix)+' ÷ '+fE(db), fN(bepM)+' Stück') +
+    mkRR('BEP Umsatz', fE(bepU)) +
+    mkRR('Sicherheitsmarge', fE(sm), sm>=0?'pos':'neg');
+}
+
+function calcSkonto() {
+  const betrag=+document.getElementById('sk-betrag').value||0;
+  const satz  =+document.getElementById('sk-satz').value||0;
+  const ziel  =+document.getElementById('sk-ziel').value||0;
+  const frist =+document.getElementById('sk-frist').value||0;
+  const bank  =+document.getElementById('sk-bank').value||0;
+  const skoB=betrag*satz/100;
+  const eff=(ziel-frist)?satz/(ziel-frist)*360:0;
+  const lohnt=eff>bank;
+  const kreditzins=betrag*bank/100*frist/360;
+  const ersparnis=skoB-kreditzins;
+  document.getElementById('skonto-res').innerHTML =
+    mkRR('Skontobetrag: '+betrag+' × '+satz+'%', fE(skoB), 'pos') +
+    mkRR('Effektivzins: '+satz+'÷('+(ziel-frist)+')×360', fP(eff)) +
+    mkRR('Bankzins', fP(bank)) +
+    mkRR('Entscheidung', lohnt?'✓ Skonto nutzen!':'✗ Nicht lohnend', lohnt?'pos':'neg') +
+    (lohnt ? mkRR('Kreditzinsen (Kosten)', fE(kreditzins),'neg') + mkRR('Netto-Ersparnis', fE(ersparnis), 'pos') : '');
+}
+
+function calcLager() {
+  const u  =+document.getElementById('l-u').value||0;
+  const ab =+document.getElementById('l-ab').value||0;
+  const eb =+document.getElementById('l-eb').value||0;
+  const jb =+document.getElementById('l-jb').value||0;
+  const bk =+document.getElementById('l-bk').value||0;
+  const ekp=+document.getElementById('l-ekp').value||0;
+  const lks=+document.getElementById('l-lks').value||0;
+  const avg=(ab+eb)/2, uh=avg?u/avg:0, ld=uh?360/uh:0;
+  const andler=ekp&&lks?Math.sqrt(200*jb*bk/(ekp*lks)):0;
+  document.getElementById('lager-res').innerHTML =
+    mkRR('Ø Lagerbestand: ('+fN(ab)+'+'+fN(eb)+')÷2', fE(avg)) +
+    mkRR('Umschlagshäufigkeit', uh.toFixed(1).replace('.',',')+'-mal/Jahr') +
+    mkRR('Lagerdauer', ld.toFixed(1).replace('.',',')+' Tage') +
+    mkRR('─── Andler-Formel ───', '') +
+    mkRR('Zähler: 200×'+jb+'×'+bk, fN(200*jb*bk)) +
+    mkRR('Nenner: '+ekp+'×'+lks, ekp*lks) +
+    mkRR('Opt. Bestellmenge', Math.ceil(andler)+' ME') +
+    mkRR('Bestellungen/Jahr', jb&&andler?Math.ceil(jb/andler)+'-mal':'–');
+}
+
+// ── INIT ──────────────────────────────────────────────────
+updateProgress();
+setTimeout(()=>{ calcBezug();calcVerkauf();calcDB();calcSkonto();calcLager(); }, 200);
+</script>
+</body>
+</html>
